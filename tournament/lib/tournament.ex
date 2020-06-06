@@ -30,8 +30,6 @@ defmodule Tournament do
   end
 
   def process_games(input) do
-    tourney = %__MODULE__{}
-
     input
     # split each item_in_input on semicolons
     |> Enum.map(&String.split(&1, @divider_character))
@@ -42,16 +40,20 @@ defmodule Tournament do
   end
 
   @spec add_game(game_recs :: game_records, new_game :: game_info) :: game_records
-  defp add_game(game_recs, {winner, loser, "win"} = new_game) do
+  defp add_game(game_recs, {winner, loser, "win"}) do
     update_winner_and_loser(winner, loser, game_recs)
   end
 
-  defp add_game(game_recs, {loser, winner, "loss"} = new_game) do
+  defp add_game(game_recs, {loser, winner, "loss"}) do
     update_winner_and_loser(winner, loser, game_recs)
   end
 
-  defp add_game(game_recs, {home, away, "draw"} = new_game) do
+  defp add_game(game_recs, {home, away, "draw"}) do
     update_tie(home, away, game_recs)
+  end
+
+  defp add_game(game_recs, _anything_else) do
+    game_recs
   end
 
   defp update_winner_and_loser(winner, loser, game_recs) do
@@ -114,7 +116,7 @@ defmodule Tournament do
     |> Map.put(away, add_tie(away_rec))
   end
 
-  defp add_win({wins, draws, losses} = record) do
+  defp add_win({wins, draws, losses}) do
     {wins + 1, draws, losses}
   end
 
@@ -122,7 +124,7 @@ defmodule Tournament do
     add_win(@blank_record)
   end
 
-  defp add_loss({wins, draws, losses} = record) do
+  defp add_loss({wins, draws, losses}) do
     {wins, draws, losses + 1}
   end
 
@@ -130,7 +132,7 @@ defmodule Tournament do
     add_loss(@blank_record)
   end
 
-  defp add_tie({wins, draws, losses} = record) do
+  defp add_tie({wins, draws, losses}) do
     {wins, draws + 1, losses}
   end
 
@@ -145,20 +147,40 @@ defmodule Tournament do
   defp pretty_print(tournament) do
     tournament.team_counter
     |> Map.to_list()
-    |> Enum.map(fn {team, {w, d, l} = record} -> {team, {w, d, l}, count_points(w, d, l)} end)
+    |> Enum.map(fn {team, {w, d, l}} -> {team, {w, d, l}, count_points(w, d, l)} end)
+    |> Enum.map(fn {team, {w, d, l}, pts} -> {team, {Enum.sum([w, d, l]), w, d, l}, pts} end)
     |> Enum.sort(fn
       {_, _, these_points}, {_, _, those_points} ->
         these_points >= those_points
     end)
-    |> output()
+    |> Enum.map(fn {name, {mp, w, d, l}, pts} -> {name, mp, w, d, l, pts} end)
+    |> add_formatting()
   end
 
-  defp count_points(wins, draws, losses) do
-    total = wins * 3 + draws
+  defp count_points(wins, draws, _losses) do
+    wins * 3 + draws
   end
 
-  defp output(sorted_team_records) do
-    sorted_team_records
-    |> Enum.map(fn {name, {w, d, l}, pts} -> end)
+  defp add_formatting(sorted_team_records) do
+    [{"Team", "MP", "W", "D", "L", "P"} | sorted_team_records]
+    |> Enum.map(fn {name, mp, w, d, l, pts} -> pad_line(name, mp, w, d, l, pts) end)
+    |> Enum.join("\n")
+  end
+
+  defp pad_line(name, matches_played, wins, draws, losses, points) do
+    list_o_num_columns = [matches_played, wins, draws, losses, points] |> Enum.map(&pad_num_column/1)
+
+    [pad_name_column(name) | list_o_num_columns]
+    |> Enum.join(" |")
+  end
+
+  defp pad_num_column(item) do
+    item
+    |> to_string()
+    |> String.pad_leading(3)
+  end
+
+  defp pad_name_column(item) do
+    String.pad_trailing(item, 30)
   end
 end
