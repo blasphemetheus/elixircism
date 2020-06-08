@@ -35,13 +35,9 @@ defmodule Markdown do
   # if the line starts with #, deal with header
   # if line starts with *, deal with list
   # otherwise split and put in paragraph tags
-  defp apply_tags_to_line(line) do
-    cond do
-      String.starts_with?(line, "#") -> tag_header_line(line) 
-      String.starts_with?(line, "*") -> tag_list_line(line)
-      true -> tag_paragraph_line(line)
-    end
-  end
+  defp apply_tags_to_line(line = "#" <> _), do: tag_header_line(line) 
+  defp apply_tags_to_line(line = "*" <> _), do: tag_list_line(line)
+  defp apply_tags_to_line(line), do: tag_paragraph_line(line)
 
   defp count_hashtags(["#" | rest], count), do: count_hashtags(rest, count + 1)
   defp count_hashtags([_anything_else | _ ], count), do: count
@@ -51,11 +47,9 @@ defmodule Markdown do
   defp tag_header_line(raw_header) do
     how_many_hashtags = String.graphemes(raw_header) |> count_hashtags(0)
     {_ , header_content} = String.split_at(raw_header, how_many_hashtags)
-    possible_leading_space_eliminated_content = String.replace_prefix(header_content, " ", "")
-
-    how_many_hashtags
-    |> to_string()
-    |> enclose_with_header_tag(possible_leading_space_eliminated_content)
+    
+    String.replace_prefix(header_content, " ", "")
+    |> enclose("h" <> to_string(how_many_hashtags))
   end
 
   defp tag_list_line(raw_list_item) do
@@ -64,27 +58,22 @@ defmodule Markdown do
 
     possible_leading_space_eliminated_content
     |> replace_md_with_tag()
-    |> enclose_with_list_item_tag()
+    |> enclose("li")
   end
 
   defp tag_paragraph_line(line) do
     line
     |> apply_italic_and_bold_tags()
-    |> enclose_with_paragraph_tag()
+    |> enclose("p")
   end
 
-  #EDIT: put in string interpolation syntax, eliminated tuple as parameter
-  defp enclose_with_header_tag(header_size, header_content) do
-    "<h#{header_size}>#{header_content}</h#{header_size}>"
+  defp enclose(enclosed, tag) do
+    opener_tag(tag) <> enclosed <> closer_tag(tag)
   end
 
-  defp enclose_with_list_item_tag(content) do
-    "<li>#{content}</li>"
-  end
+  defp opener_tag(content), do: "<#{content}>"
 
-  defp enclose_with_paragraph_tag(content) do
-    "<p>#{content}</p>"
-  end
+  defp closer_tag(content), do: "</#{content}>"
 
   defp apply_italic_and_bold_tags(line) do
     line
