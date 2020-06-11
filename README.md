@@ -10,6 +10,6 @@ Some other projects I am thinking about:
 
 * Some sort of publication platform with easily created and managed domains for communities that would allow freelance journalists and photographers covering local issues to publish their work online _and_ get paid for it. (Named FreeLense or similar). Necessary because of the unprecedented drought in local newspapers across the US especially. The Regional Newspaper genre has largely ceased to exist in the last decades as well, being eclipsed by National Newspapers with an active online presence.
 
-* I vaguely need to make an indie diy mixtape but I must become better at ableton and figure out how to boot to windows virtually because I don't want to partition my perfectly good hard drive :). I'm told Kubernetes is the way.
+* I vaguely need to make an indie diy mixtape but I must become better at ableton and figure out how to boot to windows virtually because I don't want to partition my perfectly good hard drive :). I'm told Kubernetes is the way. ***Apparently VirtualBox is much better for my purposes than making a Kube cluster including a windows machine because A) I don't wanna pay for cloud virtualization solutions and B) I'm literally looking for VirtualBox's capabilities with the wrong product***
 
 Anyway. Thanks for reading the readme!
