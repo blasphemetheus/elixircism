@@ -6,7 +6,7 @@ defmodule BinarySearchTreeTest do
   end
 
   describe "insert data at proper node" do
-    @tag :pending
+    # @tag :pending
     test "smaller number at left node" do
       root =
         BinarySearchTree.new(4)
@@ -16,7 +16,7 @@ defmodule BinarySearchTreeTest do
       assert root.left.data == 2
     end
 
-    @tag :pending
+    # @tag :pending
     test "same number at left node" do
       root =
         BinarySearchTree.new(4)
@@ -26,7 +26,7 @@ defmodule BinarySearchTreeTest do
       assert root.left.data == 4
     end
 
-    @tag :pending
+    # @tag :pending
     test "greater number at right node" do
       root =
         BinarySearchTree.new(4)
@@ -37,7 +37,7 @@ defmodule BinarySearchTreeTest do
     end
   end
 
-  @tag :pending
+  # @tag :pending
   test "can create complex tree" do
     root =
       BinarySearchTree.new(4)
@@ -58,14 +58,14 @@ defmodule BinarySearchTreeTest do
   end
 
   describe "can sort data" do
-    @tag :pending
+    # @tag :pending
     test "can sort single number" do
       root = BinarySearchTree.new(4)
 
       assert [4] == BinarySearchTree.in_order(root)
     end
 
-    @tag :pending
+    # @tag :pending
     test "can sort if second number is smaller than first" do
       root =
         BinarySearchTree.new(4)
@@ -74,7 +74,7 @@ defmodule BinarySearchTreeTest do
       assert [2, 4] == BinarySearchTree.in_order(root)
     end
 
-    @tag :pending
+    # @tag :pending
     test "can sort if second number is the same as the first" do
       root =
         BinarySearchTree.new(4)
@@ -83,7 +83,7 @@ defmodule BinarySearchTreeTest do
       assert [4, 4] == BinarySearchTree.in_order(root)
     end
 
-    @tag :pending
+    # @tag :pending
     test "can sort if second number is greater than the first" do
       root =
         BinarySearchTree.new(4)
@@ -92,7 +92,7 @@ defmodule BinarySearchTreeTest do
       assert [4, 5] == BinarySearchTree.in_order(root)
     end
 
-    @tag :pending
+    # @tag :pending
     test "can sort complex tree" do
       root =
         BinarySearchTree.new(2)
