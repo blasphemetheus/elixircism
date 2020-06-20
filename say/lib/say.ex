@@ -9,6 +9,9 @@ defmodule Say do
   defguard is_negative(val) when val < 0
   defguard is_too_big(val) when val > 999_999_999_999
 
+  defguard is_even_hundred(num) when rem(num, 100) == 0
+  defguard is_even_ten(num) when rem(num, 10) == 0
+
   @doc """
   For enunciate to work, the System outside of elixir will need to have
   espeak installed (on some linux systems, running `sudo apt-get espeak`
@@ -44,11 +47,16 @@ defmodule Say do
   defp chunkify(number) do
     number
     |> Integer.digits()
+    |> chunk_in_threes_from_decimal()
+    |> Enum.map(&Integer.undigits/1)
+  end
+
+  defp chunk_in_threes_from_decimal(digit_list) do
+    digit_list
     |> Enum.reverse()
     |> Enum.chunk_every(3)
     |> Enum.map(&Enum.reverse/1)
     |> Enum.reverse()
-    |> Enum.map(&Integer.undigits/1)
   end
 
   def scale_words([first | [0]]), do: translate(first) <> " thousand"
@@ -91,34 +99,28 @@ defmodule Say do
   defp meld_tens(num) when is_teen(num), do: translate(num - 10) <> "teen"
   defp meld_tens(num) when is_ty(num), do: meld_ty(num)
 
-
   defp meld_ty(20), do: "twenty"
   defp meld_ty(30), do: "thirty"
   defp meld_ty(40), do: "forty"
   defp meld_ty(50), do: "fifty"
   defp meld_ty(80), do: "eighty"
-  defp meld_ty(num) do
-    cond do
-      rem(num, 10) == 0 ->
-        ten_magnigtude = num / 10 |> round() |> translate()
-        ten_magnigtude <> "ty"
+  defp meld_ty(num) when is_even_ten(num) do
+    ten_magnigtude = num / 10 |> round() |> translate()
+    ten_magnigtude <> "ty"
+  end
 
-      true ->
-        tens_num = rem(num, 10) |> round()
-        translate(num - tens_num) <> "-" <> translate(tens_num)
-    end
+  defp meld_ty(num) do
+    tens_num = rem(num, 10) |> round()
+    translate(num - tens_num) <> "-" <> translate(tens_num)
+  end
+
+  defp meld_hundred(num) when is_even_hundred(num) do
+    hundred_magnitude = num / 100 |> round() |> translate()
+    hundred_magnitude <> " hundred"
   end
 
   defp meld_hundred(num) do
-    cond do
-      rem(num, 100) == 0 ->
-        hundred_magnitude = num / 100 |> round() |> translate()
-        hundred_magnitude <> " hundred"
-
-      true ->
-        hundreds_num = rem(num, 100) |> round()
-        translate(num - hundreds_num) <> " " <> translate(hundreds_num)
-
-    end
+    hundreds_num = rem(num, 100) |> round()
+    translate(num - hundreds_num) <> " " <> translate(hundreds_num)
   end
 end
